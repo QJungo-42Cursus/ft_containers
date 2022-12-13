@@ -98,17 +98,6 @@ public:
 private:
 };
 
-/* bool specialisation */
-/*
-template <> // TODO bool specialisation (juste bits...)
-class Vector<bool> {
-public:
-  Vector();
-
-private:
-};
-*/
-
 /* operator overload */
 template <class T, class Alloc>
 bool operator==(const Vector<T, Alloc> &lhs, const Vector<T, Alloc> &rhs);
