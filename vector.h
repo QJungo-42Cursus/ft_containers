@@ -5,7 +5,7 @@
 namespace ft {
 
 template <class T, class Allocator = std::allocator<T>> //
-class Vector {
+class Vector {                                          // TODO en minuscule ??
 public:
   // TODO check ceux la ...
   typedef std::random_access_iterator_tag iterator;
