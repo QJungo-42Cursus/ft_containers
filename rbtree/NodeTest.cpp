@@ -1,10 +1,11 @@
 #include "Node.h"
+#include "RedBlackTree.h"
 #include "gtest/gtest.h"
 
 TEST(_NodeTest, Constructor) {
   Node<int> *node = new Node<int>(1);
   EXPECT_EQ(1, node->data);
-  EXPECT_EQ(RED, node->color);
+  EXPECT_EQ(Node<int>::RED, node->color);
   EXPECT_EQ(NULL, node->getParent());
   EXPECT_EQ(NULL, node->getGrandParent());
   EXPECT_EQ(NULL, node->getUncle());
@@ -16,16 +17,16 @@ TEST(_NodeTest, addChild) {
   Node<int> *r_child = new Node<int>(1);
   Node<int> *l_child = new Node<int>(2);
 
-  parent->addChild(l_child, LEFT);
-  parent->addChild(r_child, RIGHT);
+  parent->addChild(l_child, Node<int>::LEFT);
+  parent->addChild(r_child, Node<int>::RIGHT);
   try {
-    parent->addChild(l_child, LEFT);
+    parent->addChild(l_child, Node<int>::LEFT);
     FAIL() << "Expected Node::NotEmptyChildException";
   } catch (Node<int>::NotEmptyChildException &e) {
     EXPECT_EQ("Node already has a child", e.what());
   }
   try {
-    parent->addChild(r_child, RIGHT);
+    parent->addChild(r_child, Node<int>::RIGHT);
     FAIL() << "Expected Node::NotEmptyChildException";
   } catch (Node<int>::NotEmptyChildException &e) {
     EXPECT_EQ("Node already has a child", e.what());
@@ -38,17 +39,23 @@ TEST(_NodeTest, addChild) {
 
 class NodeTest : public ::testing::Test {
 protected:
-  Node<int> *grandParent = new Node<int>(1);
-  Node<int> *parent = new Node<int>(1);
-  Node<int> *l_child = new Node<int>(1);
-  Node<int> *r_child = new Node<int>(1);
-  Node<int> *l_child_child = new Node<int>(1);
+  Node<int> *grandParent = new Node<int>(50);
+  Node<int> *parent = new Node<int>(25);
+  Node<int> *l_child = new Node<int>(20);
+  Node<int> *r_child = new Node<int>(30);
+  Node<int> *l_child_child = new Node<int>(10);
+
+  // Node<int> *r_parent = new Node<int>(70);
+  // Node<int> *rr_parent = new Node<int>(60);
 
   void SetUp() override {
-    grandParent->addChild(parent, LEFT);
-    parent->addChild(l_child, LEFT);
-    parent->addChild(r_child, RIGHT);
-    l_child->addChild(l_child_child, LEFT);
+    grandParent->addChild(parent, Node<int>::LEFT);
+    parent->addChild(l_child, Node<int>::LEFT);
+    parent->addChild(r_child, Node<int>::RIGHT);
+    l_child->addChild(l_child_child, Node<int>::LEFT);
+
+    // grandParent->addChild(r_parent, Node<int>::RIGHT);
+    // r_parent->addChild(rr_parent, Node<int>::LEFT);
   }
   // -----------------------------------------
   //                grandParent
@@ -58,6 +65,14 @@ protected:
   //       l_child   r_child
   //           |
   //       l_child_child
+  //
+  //                -----50-
+  //                |
+  //           ----25-----
+  //           |		 |
+  //      ----20-      -30-
+  //      |
+  //     10
   // -----------------------------------------
 
   ~NodeTest() override {
@@ -101,4 +116,16 @@ TEST_F(NodeTest, getUncle) {
   EXPECT_EQ(NULL, l_child->getUncle());
   EXPECT_EQ(NULL, r_child->getUncle());
   EXPECT_EQ(r_child, l_child_child->getUncle());
+}
+
+TEST_F(NodeTest, rotate) {
+  // TODO bon ca marche pas top
+  std::cout << "Original: " << std::endl;
+  RedBlackTree<int>::printTree(grandParent);
+  std::cout << "rotateRight: " << parent->data << " " << parent << std::endl;
+  parent->rotate(Node<int>::RIGHT);
+  RedBlackTree<int>::printTree(grandParent);
+  std::cout << "rotateRight: " << r_child->data << " " << r_child << std::endl;
+  l_child->rotate(Node<int>::LEFT);
+  RedBlackTree<int>::printTree(grandParent);
 }

@@ -1,10 +1,6 @@
 #ifndef NODE_H
 #define NODE_H
 #include <iostream>
-#define RED true
-#define BLACK false
-#define LEFT true
-#define RIGHT false
 
 // TODO pointeur ou value dedans?? const ??
 #define vtype typedef T const value_type;
@@ -19,11 +15,26 @@ public:
   struct NotEmptyChildException : std::exception {
     const char *what() const throw() { return "Node already has a child"; }
   };
+  struct CantRotateBecauseChildIsNullException : std::exception {
+    const char *what() const throw() {
+      return "The opposite child of the rotation does not exist";
+    }
+  };
+
+  enum Color { RED, BLACK };
+  enum Side { LEFT, RIGHT };
 
 public:
   /* Constructor */
   Node(value_type ndata)
       : data(ndata), _parent(NULL), _right(NULL), _left(NULL), color(RED) {}
+
+  Node(const Node<T> &other) : data(other.data) { // Copy constructor
+    color = other.color;
+    _parent = other._parent;
+    _right = other._right;
+    _left = other._left;
+  }
 
   /* Getters */
   const Node *getParent() const { return _parent; }
@@ -50,8 +61,8 @@ public:
   // y'en a po ?
 
   /* Modifiers */
-  void addChild(Node *child, bool is_left /* sinon est right */) {
-    if (is_left) {
+  void addChild(Node *child, Side side) {
+    if (side == LEFT) {
       if (_left != NULL) {
         throw NotEmptyChildException();
       }
@@ -65,13 +76,47 @@ public:
     child->_parent = this;
   }
 
-protected:
+  /// effectue une rotation depuis this, dans la direction side
+  /// TODO dans rbtree.h en vrai...
+  void rotate(Side side) {
+    if ((side == LEFT && _right == NULL) || (side == RIGHT && _left == NULL))
+      throw CantRotateBecauseChildIsNullException();
+
+    Node *this_cpy = new Node(*this);
+    if (side == LEFT) {
+      Node *right_ptr = _right;
+
+      // this
+      _right = _right->_left;
+      _parent->_left = right_ptr;
+      _parent = right_ptr;
+
+      // right
+      right_ptr->_parent = this_cpy->_parent;
+      right_ptr->_left = this;
+
+    } else if (side == RIGHT) {
+      Node *left_ptr = _left;
+
+      // this
+      _left = _left->_right;
+      _parent->_left = left_ptr;
+      _parent = left_ptr;
+
+      // right
+      left_ptr->_parent = this_cpy->_parent;
+      left_ptr->_right = this;
+    }
+  }
+
+  // protected:
+public:
   Node *_parent;
   Node *_left;
   Node *_right;
 
 public:
-  bool color;
+  Color color;
   value_type data;
 
 private:
