@@ -17,19 +17,4 @@ public:
   }
 };
 
-//
-//
-/*
-template <typename Key, typename T> //
-class PairRedBlackTree : public RedBlackTree<T> {
-  vtype;
-
-public:
-  void insert(value_type data) {
-    PairNode<Key, T> *new_node = new PairNode<Key, T>(data);
-    return;
-  }
-};
-*/
-
 #endif /* REDBLACKTREE_H */
