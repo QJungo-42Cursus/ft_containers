@@ -1,5 +1,6 @@
 #ifndef SET_H
 #define SET_H
+#include "RedBlackTree.h"
 #include <iostream>
 
 // Bonus red black tree
@@ -9,6 +10,10 @@ namespace ft {
 template <class T, class Compare = std::less<T>,
           class Alloc = std::allocator<T>>
 class set {
+private:
+  RedBlackTree<T> *_rbtree;
+
+private:
   // TODO check ceux la ...
   typedef std::bidirectional_iterator_tag iterator;
   typedef std::bidirectional_iterator_tag const_iterator;
@@ -22,6 +27,7 @@ class set {
   typedef ptrdiff_t difference_type;
   typedef T value_type;
 
+public:
   /* Constructors */
   explicit set(const key_compare &comp = key_compare(),
                const allocator_type &alloc = allocator_type()); // empty (1)
