@@ -12,6 +12,16 @@ class Node {
 
 public:
   /* Error */
+  struct HasNoParentException : std::exception {
+    const char *what() const throw() {
+      return "Node has no parent (eg: cant be a brother)";
+    }
+  };
+  struct HasNoGrandParentException : std::exception {
+    const char *what() const throw() {
+      return "Node has no grand parent (can not be a cousin)";
+    }
+  };
   struct NotEmptyChildException : std::exception {
     const char *what() const throw() { return "Node already has a child"; }
   };
@@ -36,26 +46,47 @@ public:
     _left = other._left;
   }
 
-  /* Getters */
-  const Node *getParent() const { return _parent; }
-  const Node *getUncle() const {
+  /* ??? */
+  bool isRightChild() const {
+    if (!_parent) {
+      return false;
+      throw HasNoParentException();
+    }
+    return _parent->_right == this;
+  }
+
+  bool isRightCousin() const {
+    if (!_parent) {
+      return false;
+      throw HasNoParentException();
+    }
+    if (!_parent->_parent) {
+      return false;
+      throw HasNoGrandParentException();
+    }
+    return _parent->isRightChild();
+  }
+
+  /* Getters */ // TODO ca ne renvoie pas const, est-ce bien sage ?
+  Node *getParent() const { return _parent; }
+  Node *getUncle() const {
     if (_parent == NULL || _parent->_parent == NULL) {
       return NULL;
     }
     return _parent->_parent->_left == _parent ? _parent->_parent->_right
                                               : _parent->_parent->_left;
   }
-  const Node *getGrandParent() const {
+  Node *getGrandParent() const {
     return _parent != NULL ? _parent->_parent : NULL;
   }
-  const Node *getBrother() const {
+  Node *getBrother() const {
     if (_parent == NULL) {
       return NULL;
     }
-    return _parent->_left == this ? _parent->_right : _parent->_left;
+    return isRightChild() ? _parent->_left : _parent->_right;
   }
-  /* CONST ? */ Node *getRight() const { return _right; }
-  /* CONST ? */ Node *getLeft() const { return _left; }
+  Node *getRight() const { return _right; }
+  Node *getLeft() const { return _left; }
 
   /* Setters */
   // y'en a po ?

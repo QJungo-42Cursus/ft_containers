@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   RedBlackTreeTest.cpp                               :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: qjungo <qjungo@student.42lausanne.ch>      +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/12/15 10:29:58 by qjungo            #+#    #+#             */
-/*   Updated: 2022/12/15 10:30:01 by qjungo           ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "RedBlackTree.h"
 #include "Node.h"
 #include "gtest/gtest.h"
@@ -46,10 +34,16 @@ TEST(RedBlackTreeManualTest, insert) {
 
   rbtree->insert(3);
   rbtree->insert(1);
-  rbtree->insert(0);
   rbtree->insert(5);
-  rbtree->insert(50);
-  rbtree->insert(-40);
+  rbtree->insert(0);
+  rbtree->insert(2);
+  rbtree->insert(6);
+  rbtree->insert(7);
+  rbtree->insert(9);
+  rbtree->insert(-1);
+  rbtree->insert(-2);
+  std::cout << "PRINT !:" << std::endl;
+  rbtree->printTree();
 
   delete rbtree;
 }

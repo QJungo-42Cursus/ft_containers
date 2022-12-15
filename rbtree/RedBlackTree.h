@@ -26,7 +26,8 @@ public:
       if (node->data == data) {
         return (true);
       }
-      node = compare(data, node->data) ? node->getLeft() : node->getRight();
+      node = compare(data, node->data) == Side::LEFT ? node->getLeft()
+                                                     : node->getRight();
     }
     return (false);
   }
@@ -48,13 +49,13 @@ public:
     Node<T> *node = root;
     while (true) {
       Side side = compare(data, node->data);
-      // Side side = static_cast<Side>(compare(data, node->data));
-      if ((side && !node->getLeft()) || (!side && !node->getRight())) {
+      if ((side == Side::LEFT && node->getLeft() == NULL) ||
+          (side == Side::RIGHT && node->getRight() == NULL)) {
         Node<T> *new_node = new Node<T>(data);
         node->addChild(new_node, side);
         break;
       }
-      node = side ? node->getLeft() : node->getRight();
+      node = side == Side::LEFT ? node->getLeft() : node->getRight();
     }
 
     // restoreValidity
@@ -84,74 +85,114 @@ public:
     printTree(root);
     std::cout << std::endl;
   }
+  static void printTree(Node<T> *root) {
+    /// l'idee c'est d'avoir un tableau en 2d
+    /// en x les data, dans l'ordre gauche a droite
+    /// en y leur niveau
 
-  // Merci a chatgpt
-  static void printTree(const Node<T> *node) {
-    // Create a queue to store the nodes that need to be visited
-    std::queue<const Node<T> *> nodes;
+    /// ou j'insert tout les noeuds & les NULL !
 
-    // Add the root node to the queue
-    nodes.push(node);
+    // matrix !
+    std::vector<std::vector<std::pair<bool, T>>> matrix;
 
-    // Keep track of the current level and the number of nodes in the current
-    // level
-    int level = 0;
-    int nodesInCurrentLevel = 1;
+    // add root
+    matrix.push_back(std::vector<std::pair<bool, T>>(
+        {(std::pair<bool, T>(true, root->data))}));
 
-    // Traverse the tree in a depth-first manner to find the maximum depth
-    int maxDepth = 0;
-    std::vector<const Node<T> *> path;
-    while (!path.empty() || node) {
-      if (node) {
-        path.push_back(node);
-        node = node->_left;
-      } else {
-        node = path.back();
-        path.pop_back();
-        maxDepth = std::max(maxDepth, static_cast<int>(path.size()));
-        node = node->_right;
+    /// je vais passer chaque niveau de gauche a droite
+    /// en prennant l'oncle ca devrait passer ?
+
+    Node<T> *node;
+    Node<T> *more_left_node;
+    // node = root->getLeft() ? root->getLeft() : root->getRight();
+    node = root;
+    more_left_node = root;
+
+    if (node == NULL) {
+      return;
+    }
+    int level = 1;
+    bool is_in_right = false;
+    while (true) { // y
+      std::vector<std::pair<bool, T>> layer;
+      T last_cousin;
+      bool has_last_cousin = false;
+      while (true) { // x
+        layer.push_back(node->_left
+                            ? std::pair<bool, T>(true, node->_left->data)
+                            : std::pair<bool, T>(false, 0));
+        layer.push_back(node->_right
+                            ? std::pair<bool, T>(true, node->_right->data)
+                            : std::pair<bool, T>(false, 0));
+
+        /* -> next node */
+        std::cout << (node->isRightChild() ? "right - " : "left - ");
+        if (!node->isRightChild() && node->getBrother()) {
+          // get son frere de droite (s'il est gauche)
+          std::cout << "get frere de " << node->data << std::endl;
+          node = node->getBrother();
+        } else if (!node->isRightCousin() && node->getUncle() &&
+                   (node->getUncle()->_right || node->getUncle()->_left)) {
+          // TODO le probleme c'est que s'il y a un trou
+          // entre le cousin le plus eloigne de la meme
+          // ligne et le noeud actuel, il faut remonter pour le trouver !
+          // TODO faire un fonction "find right" qui commence par chercher le
+          // frere, puis le cuisin de plus en plus loin
+
+          // get son cousin de gauche (de droite si c'est le seul)
+          std::cout << "get cousin de " << node->data << std::endl;
+          last_cousin = node->data;
+
+          Node<T> *tmp = node->getUncle();
+          node = tmp->_left ? tmp->_left : tmp->_right;
+        } else {
+          // on est au bout de la ligne
+          // on va chopper celui tout a gauche de la ligne pour
+          // commencer avec la ligne suivante
+          std::cout << "next line des " << node->data << std::endl;
+          node = more_left_node->_left ? more_left_node->_left
+                                       : more_left_node->_right;
+          break;
+        }
+        /* more_left_node */
+        if (more_left_node->_left == NULL && more_left_node->_right == NULL) {
+          // si le noeud le plus a gauch n'a pas d'enfant...
+          // TODO keep track du padding gauche du fait qu'on decal !!
+          more_left_node = node;
+          std::cout << "shift !!" << std::endl;
+        }
       }
+      if (node == NULL) {
+        break;
+      }
+      more_left_node = node;
+      matrix.push_back(layer);
+      level++;
     }
 
-    // Traverse the tree in a breadth-first manner
-    while (!nodes.empty()) {
-      // Get the next node to visit
-      const Node<T> *next = nodes.front();
-      nodes.pop();
+    // Print
+    for (auto it = matrix.begin(); it != matrix.end(); it++) {
+      std::vector<std::pair<bool, T>> vec = *it;
 
-      // Calculate the number of spaces to add before the node value
-      int numSpaces = 2 * (1 << (maxDepth - level)) - 1;
-
-      // Print the spaces and the node's value
-      for (int i = 0; i < numSpaces; i++) {
-        std::cout << "_";
-      }
-      std::cout << next->data;
-
-      // Add the left and right child nodes (if they exist) to the queue
-      if (next->_left) {
-        nodes.push(next->_left);
-      }
-      if (next->_right) {
-        nodes.push(next->_right);
+      for (auto ite = vec.begin(); ite != vec.end(); ite++) {
+        if ((*ite).first == true) {
+          std::cout << " " << (*ite).second;
+        } else {
+          std::cout << " nil";
+        }
       }
 
-      // Decrement the number of nodes in the current level
-      nodesInCurrentLevel--;
-
-      // If there are no more nodes in the current level, move to the next level
-      if (nodesInCurrentLevel == 0) {
-        std::cout << std::endl;
-        level++;
-        nodesInCurrentLevel = nodes.size();
-      }
+      std::cout << std::endl;
     }
   }
 
 private:
   static Side compare(T leftData, T rightData) {
     Compare comparator;
-    return static_cast<Side>(comparator(leftData, rightData));
+    if (comparator(leftData, rightData))
+      return Side::LEFT;
+    else
+      return Side::RIGHT;
   }
 };
 

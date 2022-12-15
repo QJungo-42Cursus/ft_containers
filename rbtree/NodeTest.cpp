@@ -112,6 +112,10 @@ TEST_F(NodeTest, getUncle) {
   EXPECT_EQ(r_child, l_child_child->getUncle());
 }
 
+TEST_F(NodeTest, isRightChild) {
+  EXPECT_EQ(true, r_child->isRightChild());
+  EXPECT_EQ(false, l_child->isRightChild());
+}
 /*1
 TEST_F(NodeTest, rotate) {
   // TODO bon ca marche pas top -> a vraiment verifier
