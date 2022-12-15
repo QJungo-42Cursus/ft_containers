@@ -6,7 +6,7 @@ TEST(NodeTestManual, Constructor) {
   Node<int> *node = new Node<int>(1);
   EXPECT_EQ(1, node->data);
   EXPECT_EQ(Node<int>::RED, node->color);
-  EXPECT_EQ(NULL, node->getParent());
+  EXPECT_EQ(NULL, node->parent);
   EXPECT_EQ(NULL, node->getGrandParent());
   EXPECT_EQ(NULL, node->getUncle());
   delete node;
@@ -84,16 +84,16 @@ TEST_F(NodeTest, getBrother) {
 }
 
 TEST_F(NodeTest, getRight_getLeft) {
-  EXPECT_EQ(r_child, parent->getRight());
-  EXPECT_EQ(l_child, parent->getLeft());
+  EXPECT_EQ(r_child, parent->right);
+  EXPECT_EQ(l_child, parent->left);
 }
 
 TEST_F(NodeTest, getParent) {
-  EXPECT_EQ(NULL, grandParent->getParent());
-  EXPECT_EQ(grandParent, parent->getParent());
-  EXPECT_EQ(parent, l_child->getParent());
-  EXPECT_EQ(parent, r_child->getParent());
-  EXPECT_EQ(l_child, l_child_child->getParent());
+  EXPECT_EQ(NULL, grandParent->parent);
+  EXPECT_EQ(grandParent, parent->parent);
+  EXPECT_EQ(parent, l_child->parent);
+  EXPECT_EQ(parent, r_child->parent);
+  EXPECT_EQ(l_child, l_child_child->parent);
 }
 
 TEST_F(NodeTest, getGrandParent) {
@@ -116,16 +116,3 @@ TEST_F(NodeTest, isRightChild) {
   EXPECT_EQ(true, r_child->isRightChild());
   EXPECT_EQ(false, l_child->isRightChild());
 }
-/*1
-TEST_F(NodeTest, rotate) {
-  // TODO bon ca marche pas top -> a vraiment verifier
-  std::cout << "Original: " << std::endl;
-  RedBlackTree<int>::printTree(grandParent);
-  std::cout << "rotateRight: " << parent->data << " " << parent << std::endl;
-  parent->rotate(Node<int>::RIGHT);
-  RedBlackTree<int>::printTree(grandParent);
-  std::cout << "rotateLeft: " << l_child->data << " " << r_child << std::endl;
-  l_child->rotate(Node<int>::LEFT);
-  RedBlackTree<int>::printTree(grandParent);
-}
-*/

@@ -2,15 +2,40 @@
 #define NODE_H
 #include <iostream>
 
-// TODO pointeur ou value dedans?? const ??
 #define vtype typedef T const value_type;
 #define ktype typedef T const key_type;
 
 template <typename T> //
 class Node {
-  vtype;
-
 public:
+  /* typedef */
+  vtype;
+  enum Color { RED, BLACK };
+  enum Side { LEFT, RIGHT };
+
+  /* Members */
+  Node *parent;
+  Node *left;
+  Node *right;
+  Color color;
+  value_type data;
+
+  /* Constructor */
+  Node(value_type ndata)
+      : data(ndata), parent(NULL), right(NULL), left(NULL), color(RED) {}
+
+  Node(const Node<T> &other) : data(other.data) { // Copy constructor
+    color = other.color;
+    parent = other.parent;
+    right = other.right;
+    left = other.left;
+  }
+
+  /* Assigement operator */
+  Node &operator=(const Node &rhs) {
+    // TODO assigment op
+  }
+
   /* Error */
   struct HasNoParentException : std::exception {
     const char *what() const throw() {
@@ -31,124 +56,74 @@ public:
     }
   };
 
-  typedef enum Color { RED, BLACK } Color;
-  typedef enum Side { LEFT, RIGHT } Side;
-
-public:
-  /* Constructor */
-  Node(value_type ndata)
-      : data(ndata), _parent(NULL), _right(NULL), _left(NULL), color(RED) {}
-
-  Node(const Node<T> &other) : data(other.data) { // Copy constructor
-    color = other.color;
-    _parent = other._parent;
-    _right = other._right;
-    _left = other._left;
-  }
-
   /* ??? */
   bool isRightChild() const {
-    if (!_parent) {
+    if (!parent) {
       return false;
       throw HasNoParentException();
     }
-    return _parent->_right == this;
+    return parent->right == this;
   }
 
-  bool isRightCousin() const {
-    if (!_parent) {
+  bool isRightCousin() const { // TODO isParentRightChild()
+    if (!parent) {
       return false;
       throw HasNoParentException();
     }
-    if (!_parent->_parent) {
+    if (!parent->parent) {
       return false;
       throw HasNoGrandParentException();
     }
-    return _parent->isRightChild();
+    return parent->isRightChild();
   }
 
-  /* Getters */ // TODO ca ne renvoie pas const, est-ce bien sage ?
-  Node *getParent() const { return _parent; }
+  /* Getters */
   Node *getUncle() const {
-    if (_parent == NULL || _parent->_parent == NULL) {
+    if (parent == NULL || parent->parent == NULL) {
       return NULL;
     }
-    return _parent->_parent->_left == _parent ? _parent->_parent->_right
-                                              : _parent->_parent->_left;
+    return parent->parent->left == parent ? parent->parent->right
+                                          : parent->parent->left;
   }
   Node *getGrandParent() const {
-    return _parent != NULL ? _parent->_parent : NULL;
+    return parent != NULL ? parent->parent : NULL;
   }
   Node *getBrother() const {
-    if (_parent == NULL) {
+    if (parent == NULL) {
       return NULL;
     }
-    return isRightChild() ? _parent->_left : _parent->_right;
+    return isRightChild() ? parent->left : parent->right;
   }
-  Node *getRight() const { return _right; }
-  Node *getLeft() const { return _left; }
+  Node *getFirstRightSibling(int depth = 0) const {
+    /// Retourn le 1er noeud a droite qui trouve sur la meme generation que lui
 
-  /* Setters */
-  // y'en a po ?
+    // s'il a un frere a droite
+    if (depth == 0 && !this->isRightChild() && this->getBrother()) {
+      return this->getBrother();
+    }
+
+    if (!this->isRightCousin() && this->getUncle() &&
+        (this->getUncle()->right || this->getUncle()->left)) {
+      // get son cousin de gauche (de droite si c'est le seul)
+      Node<T> *tmp = this->getUncle();
+      this = tmp->left ? tmp->left : tmp->right;
+      return NULL;
+    }
+  }
 
   /* Modifiers */
   void addChild(Node *child, Side side) {
-    if (side == LEFT) {
-      if (_left != NULL) {
-        throw NotEmptyChildException();
-      }
-      _left = child;
-    } else {
-      if (_right != NULL) {
-        throw NotEmptyChildException();
-      }
-      _right = child;
+    if ((side == LEFT && left != NULL) || (side == RIGHT && right != NULL)) {
+      throw NotEmptyChildException();
     }
-    child->_parent = this;
-  }
-
-  /// effectue une rotation depuis this, dans la direction side
-  /// TODO dans rbtree.h en vrai...
-  void rotate(Side side) {
-    if ((side == LEFT && _right == NULL) || (side == RIGHT && _left == NULL))
-      throw CantRotateBecauseChildIsNullException();
-
-    Node *this_cpy = new Node(*this);
     if (side == LEFT) {
-      Node *right_ptr = _right;
-
-      // this
-      _right = _right->_left;
-      _parent->_left = right_ptr;
-      _parent = right_ptr;
-
-      // right
-      right_ptr->_parent = this_cpy->_parent;
-      right_ptr->_left = this;
-
-    } else if (side == RIGHT) {
-      Node *left_ptr = _left;
-
-      // this
-      _left = _left->_right;
-      _parent->_left = left_ptr;
-      _parent = left_ptr;
-
-      // right
-      left_ptr->_parent = this_cpy->_parent;
-      left_ptr->_right = this;
+      left = child;
     }
+    if (side == RIGHT) {
+      right = child;
+    }
+    child->parent = this;
   }
-
-  // protected:
-public:
-  Node *_parent;
-  Node *_left;
-  Node *_right;
-
-public:
-  Color color;
-  value_type data;
 
 private:
   Node(); // ne peut pas creer un noeud vide

@@ -26,8 +26,7 @@ public:
       if (node->data == data) {
         return (true);
       }
-      node = compare(data, node->data) == Side::LEFT ? node->getLeft()
-                                                     : node->getRight();
+      node = compare(data, node->data) == Side::LEFT ? node->left : node->right;
     }
     return (false);
   }
@@ -49,13 +48,13 @@ public:
     Node<T> *node = root;
     while (true) {
       Side side = compare(data, node->data);
-      if ((side == Side::LEFT && node->getLeft() == NULL) ||
-          (side == Side::RIGHT && node->getRight() == NULL)) {
+      if ((side == Side::LEFT && node->left == NULL) ||
+          (side == Side::RIGHT && node->right == NULL)) {
         Node<T> *new_node = new Node<T>(data);
         node->addChild(new_node, side);
         break;
       }
-      node = side == Side::LEFT ? node->getLeft() : node->getRight();
+      node = side == Side::LEFT ? node->left : node->right;
     }
 
     // restoreValidity
@@ -76,8 +75,43 @@ public:
     // TODO
   }
 
+  /// effectue une rotation depuis this, dans la direction side
+  /// TODO dans rbtree.h en vrai...
+  /// maintenant quil y est je regrette...
+  static void rotate(Node<T> *node, Side side) {
+    if ((side == Side::LEFT && node->right == NULL) ||
+        (side == Side::RIGHT && node->left == NULL))
+      throw typename Node<T>::CantRotateBecauseChildIsNullException();
+
+    Node<T> *node_cpy = new Node<T>(*node);
+    if (side == Side::LEFT) {
+      Node<T> *right_ptr = node->right;
+
+      // node
+      node->right = node->right->left;
+      node->parent->left = right_ptr;
+      node->parent = right_ptr;
+
+      // right
+      right_ptr->parent = node_cpy->parent;
+      right_ptr->left = node;
+
+    } else if (side == Side::RIGHT) {
+      Node<T> *left_ptr = node->left;
+
+      // node
+      node->left = node->left->right;
+      node->parent->left = left_ptr;
+      node->parent = left_ptr;
+
+      // right
+      left_ptr->parent = node_cpy->parent;
+      left_ptr->right = node;
+    }
+  }
+
   /* Debug log */
-  void printTree() {
+  void printTree() const {
     if (root == NULL) {
       std::cout << "Tree is empty" << std::endl;
       return;
@@ -85,6 +119,7 @@ public:
     printTree(root);
     std::cout << std::endl;
   }
+
   static void printTree(Node<T> *root) {
     /// l'idee c'est d'avoir un tableau en 2d
     /// en x les data, dans l'ordre gauche a droite
@@ -104,7 +139,6 @@ public:
 
     Node<T> *node;
     Node<T> *more_left_node;
-    // node = root->getLeft() ? root->getLeft() : root->getRight();
     node = root;
     more_left_node = root;
 
@@ -113,53 +147,38 @@ public:
     }
     int level = 1;
     bool is_in_right = false;
-    while (true) { // y
+    while (true) {
       std::vector<std::pair<bool, T>> layer;
-      T last_cousin;
-      bool has_last_cousin = false;
-      while (true) { // x
-        layer.push_back(node->_left
-                            ? std::pair<bool, T>(true, node->_left->data)
+      while (true) {
+        layer.push_back(node->left //
+                            ? std::pair<bool, T>(true, node->left->data)
                             : std::pair<bool, T>(false, 0));
-        layer.push_back(node->_right
-                            ? std::pair<bool, T>(true, node->_right->data)
+        layer.push_back(node->right
+                            ? std::pair<bool, T>(true, node->right->data)
                             : std::pair<bool, T>(false, 0));
 
         /* -> next node */
-        std::cout << (node->isRightChild() ? "right - " : "left - ");
         if (!node->isRightChild() && node->getBrother()) {
           // get son frere de droite (s'il est gauche)
-          std::cout << "get frere de " << node->data << std::endl;
           node = node->getBrother();
         } else if (!node->isRightCousin() && node->getUncle() &&
-                   (node->getUncle()->_right || node->getUncle()->_left)) {
-          // TODO le probleme c'est que s'il y a un trou
-          // entre le cousin le plus eloigne de la meme
-          // ligne et le noeud actuel, il faut remonter pour le trouver !
-          // TODO faire un fonction "find right" qui commence par chercher le
-          // frere, puis le cuisin de plus en plus loin
-
+                   (node->getUncle()->right || node->getUncle()->left)) {
           // get son cousin de gauche (de droite si c'est le seul)
-          std::cout << "get cousin de " << node->data << std::endl;
-          last_cousin = node->data;
-
           Node<T> *tmp = node->getUncle();
-          node = tmp->_left ? tmp->_left : tmp->_right;
+          node = tmp->left ? tmp->left : tmp->right;
         } else {
           // on est au bout de la ligne
           // on va chopper celui tout a gauche de la ligne pour
           // commencer avec la ligne suivante
-          std::cout << "next line des " << node->data << std::endl;
-          node = more_left_node->_left ? more_left_node->_left
-                                       : more_left_node->_right;
+          node = more_left_node->left ? more_left_node->left
+                                      : more_left_node->right;
           break;
         }
         /* more_left_node */
-        if (more_left_node->_left == NULL && more_left_node->_right == NULL) {
+        if (more_left_node->left == NULL && more_left_node->right == NULL) {
           // si le noeud le plus a gauch n'a pas d'enfant...
           // TODO keep track du padding gauche du fait qu'on decal !!
           more_left_node = node;
-          std::cout << "shift !!" << std::endl;
         }
       }
       if (node == NULL) {

@@ -48,7 +48,6 @@ TEST(RedBlackTreeManualTest, insert) {
   delete rbtree;
 }
 
-/*
 class RedBlackTreeTest : public ::testing::Test {
 protected:
   RedBlackTree<int> *rbtree = new RedBlackTree<int>();
@@ -65,6 +64,13 @@ protected:
 
   ~RedBlackTreeTest() { delete rbtree; }
 };
-*/
 
 // TEST_F(RedBlackTreeTest, Insert) {}
+
+TEST_F(RedBlackTreeTest, rotate) {
+  std::cout << "Original: " << std::endl;
+  rbtree->printTree();
+  RedBlackTree<int>::rotate(rbtree->root->left, Node<int>::LEFT);
+  std::cout << "apres : " << std::endl;
+  rbtree->printTree();
+}
