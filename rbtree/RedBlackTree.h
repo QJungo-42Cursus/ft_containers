@@ -4,38 +4,64 @@
 #include <iostream>
 #include <queue>
 #include <vector>
-// TODO pointeur ou value dedans?? const ??
 
 template <class T, class Compare = std::less<T>,
           class Alloc = std::allocator<T>>
 class RedBlackTree {
-private:
+  // private:
+public:
   Node<T> *root;
+  typedef typename Node<T>::Side Side;
+  typedef typename Node<T>::Color Color;
 
 public:
   vtype;
 
 public:
+  /// renvoie true si la data/key exist deja
+  /// on va parcourir tout l'arbre, valeur apres valeur en comparant
+  bool keyExist(value_type data) {
+    const Node<T> *node = root;
+    while (node != NULL) {
+      if (node->data == data) {
+        return (true);
+      }
+      node = compare(data, node->data) ? node->getLeft() : node->getRight();
+    }
+    return (false);
+  }
+
   /// descend dans l'arbre jusqua l'endroit adequat pour place le new node
   void insert(value_type data) {
-    if (keyExist()) {
-      // TODO throw ??
+    if (root == NULL) {
+      root = new Node<T>(data);
+      root->color = Node<T>::BLACK; // gere la 1er exception
+      return;
     }
-    Node<T> *new_node = new Node<T>(data);
 
-    // TODO recursive insert
+    if (keyExist(data)) {
+      // TODO throw ?? return false ??
+      return;
+    }
 
-    if (!restoreValidity()) {
+    // insert
+    Node<T> *node = root;
+    while (true) {
+      Side side = compare(data, node->data);
+      // Side side = static_cast<Side>(compare(data, node->data));
+      if ((side && !node->getLeft()) || (!side && !node->getRight())) {
+        Node<T> *new_node = new Node<T>(data);
+        node->addChild(new_node, side);
+        break;
+      }
+      node = side ? node->getLeft() : node->getRight();
+    }
+
+    // restoreValidity
+    if (!respectValidity()) {
       restoreValidity();
     }
     return;
-  }
-
-  /// renvoie true si la data/key exist deja
-  bool keyExist(value_type data) {
-
-    // TODO
-    return (true);
   }
 
   /// renvoie true si l'arbre en valide
@@ -50,12 +76,12 @@ public:
   }
 
   /* Debug log */
-  void asciiArtPrintTree() {
+  void printTree() {
     if (root == NULL) {
       std::cout << "Tree is empty" << std::endl;
       return;
     }
-    printTree(root, 0);
+    printTree(root);
     std::cout << std::endl;
   }
 
@@ -120,6 +146,12 @@ public:
         nodesInCurrentLevel = nodes.size();
       }
     }
+  }
+
+private:
+  static Side compare(T leftData, T rightData) {
+    Compare comparator;
+    return static_cast<Side>(comparator(leftData, rightData));
   }
 };
 

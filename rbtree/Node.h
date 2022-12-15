@@ -21,8 +21,8 @@ public:
     }
   };
 
-  enum Color { RED, BLACK };
-  enum Side { LEFT, RIGHT };
+  typedef enum Color { RED, BLACK } Color;
+  typedef enum Side { LEFT, RIGHT } Side;
 
 public:
   /* Constructor */
@@ -54,8 +54,8 @@ public:
     }
     return _parent->_left == this ? _parent->_right : _parent->_left;
   }
-  const Node *getRight() const { return _right; }
-  const Node *getLeft() const { return _left; }
+  /* CONST ? */ Node *getRight() const { return _right; }
+  /* CONST ? */ Node *getLeft() const { return _left; }
 
   /* Setters */
   // y'en a po ?
