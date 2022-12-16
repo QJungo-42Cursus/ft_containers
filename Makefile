@@ -4,7 +4,10 @@ CFLAGS =	-Wall -Wextra -Werror -std=c++98
 RM =		rm -f
 GTEST =		/usr/local/lib/libgtest.a
 
-SRCS =		rbtree/RedBlackTreeTest.cpp rbtree/NodeTest.cpp tests/main.cpp
+SRCS =		tests/RedBlackTreeTest.cpp \
+			tests/NodeTest.cpp \
+			tests/vectorTest.cpp \
+			tests/main.cpp
 
 OBJS =		$(SRCS:.cpp=.o)
 

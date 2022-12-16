@@ -1,5 +1,5 @@
-#include "RedBlackTree.h"
-#include "Node.h"
+#include "../rbtree/RedBlackTree.h"
+#include "../rbtree/Node.h"
 #include "gtest/gtest.h"
 
 TEST(RedBlackTreeManualTest, keyExist) {
@@ -29,6 +29,7 @@ TEST(RedBlackTreeManualTest, keyDoesntExist) {
   delete rbtree;
 }
 
+/*
 TEST(RedBlackTreeManualTest, insert) {
   RedBlackTree<int> *rbtree = new RedBlackTree<int>();
 
@@ -72,3 +73,4 @@ TEST_F(RedBlackTreeTest, rotate) {
   // std::cout << "apres : " << std::endl;
   // rbtree->printTree();
 }
+*/

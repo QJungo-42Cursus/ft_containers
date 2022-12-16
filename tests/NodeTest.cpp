@@ -1,5 +1,5 @@
-#include "Node.h"
-#include "RedBlackTree.h"
+#include "../rbtree/Node.h"
+#include "../rbtree/RedBlackTree.h"
 #include "gtest/gtest.h"
 
 TEST(NodeTestManual, Constructor) {
