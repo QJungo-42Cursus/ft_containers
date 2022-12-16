@@ -116,3 +116,8 @@ TEST_F(NodeTest, isRightChild) {
   EXPECT_EQ(true, r_child->isRightChild());
   EXPECT_EQ(false, l_child->isRightChild());
 }
+
+TEST_F(NodeTest, getFirstRightSibling) {
+  EXPECT_EQ(r_child, l_child->getFirstRightSibling());
+  EXPECT_EQ(NULL, r_child->getFirstRightSibling());
+}

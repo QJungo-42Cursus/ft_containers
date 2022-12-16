@@ -152,10 +152,10 @@ public:
       while (true) {
         layer.push_back(node->left //
                             ? std::pair<bool, T>(true, node->left->data)
-                            : std::pair<bool, T>(false, 0));
+                            : std::pair<bool, T>(false, node->data));
         layer.push_back(node->right
                             ? std::pair<bool, T>(true, node->right->data)
-                            : std::pair<bool, T>(false, 0));
+                            : std::pair<bool, T>(false, node->data));
 
         /* -> next node */
         if (!node->isRightChild() && node->getBrother()) {

@@ -94,21 +94,33 @@ public:
     }
     return isRightChild() ? parent->left : parent->right;
   }
-  Node *getFirstRightSibling(int depth = 0) const {
+  Node *getFirstRightSibling(int depth = 0, Node *current_node = NULL) {
     /// Retourn le 1er noeud a droite qui trouve sur la meme generation que lui
 
-    // s'il a un frere a droite
-    if (depth == 0 && !this->isRightChild() && this->getBrother()) {
-      return this->getBrother();
+    if (current_node == NULL) {
+      current_node = this;
     }
+    if (depth == 0 && !current_node->isRightChild() &&
+        current_node->getBrother()) {
+      return current_node->getBrother();
+    }
+    return current_node->right
+               ? getFirstRightSibling(depth - 1, current_node->right)
+               : NULL;
 
-    if (!this->isRightCousin() && this->getUncle() &&
-        (this->getUncle()->right || this->getUncle()->left)) {
-      // get son cousin de gauche (de droite si c'est le seul)
-      Node<T> *tmp = this->getUncle();
-      this = tmp->left ? tmp->left : tmp->right;
-      return NULL;
-    }
+    /*
+// s'il a un frere a droite
+if (depth == 0 && !this->isRightChild() && this->getBrother()) {
+  return this->getBrother();
+}
+
+if (!this->isRightCousin() && this->getUncle() &&
+    (this->getUncle()->right || this->getUncle()->left)) {
+  // get son cousin de gauche (de droite si c'est le seul)
+  Node *tmp = this->getUncle();
+  return tmp->left ? tmp->left : tmp->right;
+}
+    */
   }
 
   /* Modifiers */

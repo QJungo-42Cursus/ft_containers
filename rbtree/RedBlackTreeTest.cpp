@@ -52,13 +52,13 @@ class RedBlackTreeTest : public ::testing::Test {
 protected:
   RedBlackTree<int> *rbtree = new RedBlackTree<int>();
   void SetUp() override {
-    std::cout << "Initial form : " << std::endl;
     rbtree->insert(3);
     rbtree->insert(1);
     rbtree->insert(0);
     rbtree->insert(5);
     rbtree->insert(50);
     rbtree->insert(-40);
+    std::cout << "Initial form : " << std::endl;
     rbtree->printTree();
   }
 
@@ -68,9 +68,7 @@ protected:
 // TEST_F(RedBlackTreeTest, Insert) {}
 
 TEST_F(RedBlackTreeTest, rotate) {
-  std::cout << "Original: " << std::endl;
-  rbtree->printTree();
-  RedBlackTree<int>::rotate(rbtree->root->left, Node<int>::LEFT);
-  std::cout << "apres : " << std::endl;
-  rbtree->printTree();
+  // RedBlackTree<int>::rotate(rbtree->root->left, Node<int>::LEFT);
+  // std::cout << "apres : " << std::endl;
+  // rbtree->printTree();
 }
