@@ -32,9 +32,8 @@ $(NAME): build
 	./$(NAME)
 
 
-build: ft_tl/pair.h $(OBJS)
+build: $(OBJS)
 	@$(CC) $(CFLAGS) $(OBJS) -o $(NAME) $(GTEST)
-
 
 clean:
 	@$(RM) $(OBJS)

@@ -2,8 +2,10 @@
 #define NODE_H
 #include <iostream>
 
-#define vtype typedef T const value_type;
-#define ktype typedef T const key_type;
+//#define vtype typedef T const value_type;
+//#define ktype typedef T const key_type;
+#define vtype typedef T value_type;
+#define ktype typedef T key_type;
 
 template <typename T> //
 class Node {
@@ -13,28 +15,25 @@ public:
   enum Color { RED, BLACK };
   enum Side { LEFT, RIGHT };
 
+  /* Constructor */
+  Node(value_type ndata)
+      : data(ndata), parent(NULL), right(NULL), left(NULL), color(RED) {}
+
+  // Node(const Node<T> &other)
+  //     : data(other.data), parent(other.parent), right(other.right),
+  //       left(other.left), color(other.color) {}
+
+  /* Assigement operator */
+  Node &operator=(const Node &rhs) {
+    // TODO assigment op
+  }
+
   /* Members */
   Node *parent;
   Node *left;
   Node *right;
   Color color;
   value_type data;
-
-  /* Constructor */
-  Node(value_type ndata)
-      : data(ndata), parent(NULL), right(NULL), left(NULL), color(RED) {}
-
-  Node(const Node<T> &other) : data(other.data) { // Copy constructor
-    color = other.color;
-    parent = other.parent;
-    right = other.right;
-    left = other.left;
-  }
-
-  /* Assigement operator */
-  Node &operator=(const Node &rhs) {
-    // TODO assigment op
-  }
 
   /* Error */
   struct HasNoParentException : std::exception {
