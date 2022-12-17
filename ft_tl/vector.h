@@ -46,6 +46,7 @@ public:
 
   // Assign operator
   vector &operator=(const vector &x) {
+    std::cout << "assign operator" << std::endl;
     if (this != &x) {
       _allocator = x._allocator;
       _size = x._size;
@@ -80,7 +81,7 @@ public:
   size_type max_size() const { return _allocator.max_size(); } // TODO check
   size_type capacity() const { return _capacity; }
   void resize(size_type n, T val = T());
-  bool empty() const;
+  bool empty() const { return _size == 0; }
   void reserve(size_type n);
   void shrink_to_fit();
 
@@ -88,19 +89,53 @@ public:
   T &operator[](size_type n);
   const T &operator[](size_type n) const;
   T &at(size_type n) {
-    // TODO
-    return T();
+    if (n >= _size || n < 0) {
+      throw std::out_of_range("vector"); // TODO
+    }
+    return _array[n];
   }
   const T &at(size_type n) const {
-    // TODO
-    return T();
+    if (n >= _size || n < 0) {
+      throw std::out_of_range("vector"); // TODO
+    }
+    return _array[n];
   }
-  T front();
-  const T front() const;
-  T &back();
-  const T &back() const;
-  T *data();
-  const T *data() const;
+  T front() {
+    if (_size == 0) {
+      throw std::out_of_range("vector"); // TODO
+    }
+    return _array[0];
+  }
+  const T front() const {
+    if (_size == 0) {
+      throw std::out_of_range("vector"); // TODO
+    }
+    return _array[0];
+  }
+  T &back() {
+    if (_size == 0) {
+      throw std::out_of_range("vector"); // TODO
+    }
+    return _array[_size - 1];
+  }
+  const T &back() const {
+    if (_size == 0) {
+      throw std::out_of_range("vector"); // TODO
+    }
+    return _array[_size - 1];
+  }
+  T *data() {
+    if (_size == 0) {
+      throw std::out_of_range("vector"); // TODO
+    }
+    return _array;
+  }
+  const T *data() const {
+    if (_size == 0) {
+      throw std::out_of_range("vector"); // TODO
+    }
+    return _array;
+  }
 
   // Modifiers
   void push_back(const T &val) {
