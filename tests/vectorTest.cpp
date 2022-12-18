@@ -2,7 +2,7 @@
 #include "gtest/gtest.h"
 #include <vector>
 
-TEST(VectorTestManual, DefaultConstructor) {
+TEST(ManualVectorTest, DefaultConstructor) {
   ft::vector<int> *vector = new ft::vector<int>();
   std::vector<int> *trueVector = new std::vector<int>();
 
@@ -42,12 +42,12 @@ TEST(VectorTestManual, DefaultConstructor) {
   EXPECT_EQ(trueStackVector.max_size(), stackVector.max_size());
 }
 
-TEST(VectorTestManual, AssignOperator) {
+TEST(ManualVectorTest, AssignOperator) {
   ft::vector<int> *vector = new ft::vector<int>();
   std::vector<int> *trueVector = new std::vector<int>();
 
   ft::vector<int> vector2 = *vector; // TODO c'est currieux, il n'est appeler
-									 // que la ligne suivante
+                                     // que la ligne suivante
   vector2 = *vector;
   EXPECT_EQ(trueVector->size(), vector2.size());
   EXPECT_EQ(trueVector->capacity(), vector2.capacity());
@@ -58,7 +58,7 @@ TEST(VectorTestManual, AssignOperator) {
   delete trueVector;
 }
 
-TEST(VectorTestManual, FillConstructor) {
+TEST(ManualVectorTest, FillConstructor) {
   ft::vector<int> *vector = new ft::vector<int>(5);
   std::vector<int> *trueVector = new std::vector<int>(5);
   EXPECT_EQ(trueVector->size(), vector->size());
@@ -73,7 +73,7 @@ TEST(VectorTestManual, FillConstructor) {
   delete vector;
 }
 
-TEST(VectorTestManual, CopyConstructor) {
+TEST(ManualVectorTest, CopyConstructor) {
   ft::vector<int> *vector = new ft::vector<int>(5);
   ft::vector<int> *vector2 = new ft::vector<int>(*vector);
   EXPECT_EQ(5, vector2->size());

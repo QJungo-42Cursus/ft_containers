@@ -9,6 +9,7 @@
 
 template <typename T> //
 class Node {
+
 public:
   /* typedef */
   vtype;
@@ -27,13 +28,6 @@ public:
   Node &operator=(const Node &rhs) {
     // TODO assigment op
   }
-
-  /* Members */
-  Node *parent;
-  Node *left;
-  Node *right;
-  Color color;
-  value_type data;
 
   /* Error */
   struct HasNoParentException : std::exception {
@@ -135,6 +129,13 @@ if (!this->isRightCousin() && this->getUncle() &&
     }
     child->parent = this;
   }
+
+  /* Members */
+  value_type data;
+  Node *parent;
+  Node *right;
+  Node *left;
+  Color color;
 
 private:
   Node(); // ne peut pas creer un noeud vide

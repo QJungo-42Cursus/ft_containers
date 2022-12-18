@@ -27,7 +27,7 @@ public:
                   const Allocator &alloc = Allocator())
       : _allocator(alloc), _size(n), _capacity(n) {
     _array = _allocator.allocate(n);
-    for (int i = 0; i < n; i++) {
+    for (size_type i = 0; i < n; i++) {
       _array[i] = val;
     }
   }
@@ -39,7 +39,7 @@ public:
   vector(const vector &x)
       : _allocator(x._allocator), _size(x._size), _capacity(x._capacity) {
     _array = _allocator.allocate(_capacity);
-    for (int i = 0; i < _size; i++) {
+    for (size_type i = 0; i < _size; i++) {
       _array[i] = x._array[i];
     }
   }
@@ -52,7 +52,7 @@ public:
       _size = x._size;
       _capacity = x._capacity;
       _array = _allocator.allocate(_capacity); // TODO leaks ??
-      for (int i = 0; i < _size; i++) {
+      for (size_type i = 0; i < _size; i++) {
         _array[i] = x._array[i];
       }
     }
@@ -89,7 +89,7 @@ public:
   T &operator[](size_type n);
   const T &operator[](size_type n) const;
   T &at(size_type n) {
-    if (n >= _size || n < 0) {
+    if (n >= _size) {
       throw std::out_of_range("vector"); // TODO
     }
     return _array[n];
@@ -144,7 +144,7 @@ public:
       size_type old_capacity = _capacity;
       _capacity += 10; // TODO pourquoi pas plus ou moins ?
       _array = _allocator.allocate(_capacity);
-      for (int i = 0; i < _size; i++) {
+      for (size_type i = 0; i < _size; i++) {
         _array[i] = tmp_array[i];
       }
       _allocator.deallocate(tmp_array, old_capacity);
@@ -183,10 +183,10 @@ public:
   Allocator get_allocator() const;
 
 private:
-  T *_array;
+  Allocator _allocator;
   size_type _size;
   size_type _capacity;
-  Allocator _allocator;
+  T *_array;
 };
 
 /* operator overload */
