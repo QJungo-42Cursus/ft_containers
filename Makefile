@@ -16,6 +16,7 @@ SRCS =		tests/main.cpp \
 			tests/pairTest.cpp \
 			tests/RedBlackTreeTest.cpp \
 			tests/NodeTest.cpp \
+			tests/iterator_traitsTest.cpp \
 
 HEADERS =	rbtree/RedBlackTree.h \
 			rbtree/Node.h \
@@ -23,7 +24,8 @@ HEADERS =	rbtree/RedBlackTree.h \
 			ft_tl/set.h \
 			ft_tl/stack.h \
 			ft_tl/map.h \
-			ft_tl/pair.h
+			ft_tl/iterator_traits.h \
+			ft_tl/pair.h \
 
 all: $(NAME)
 
