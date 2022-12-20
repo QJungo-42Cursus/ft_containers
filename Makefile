@@ -41,7 +41,7 @@ clean:
 fclean: clean
 	@$(RM) $(NAME)
 
-re: fclean all
+re: fclean build
 
 #### Specific tests ####
 # STL

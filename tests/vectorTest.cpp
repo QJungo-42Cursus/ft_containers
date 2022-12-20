@@ -1,100 +1,245 @@
 #include "../ft_tl/vector.h"
 #include "gtest/gtest.h"
+#include <memory>
 #include <vector>
 
-TEST(ManualVectorTest, DefaultConstructor) {
-  ft::vector<int> *vector = new ft::vector<int>();
-  std::vector<int> *trueVector = new std::vector<int>();
-
-  EXPECT_EQ(trueVector->size(), vector->size());
-  EXPECT_EQ(trueVector->capacity(), vector->capacity());
-  EXPECT_EQ(trueVector->empty(), vector->empty());
-  EXPECT_EQ(trueVector->max_size(), vector->max_size());
-
-  /* TODO error handling !
-  std::string error;
-  try {
-    trueVector->at(0);
-    FAIL();
-  } catch (std::out_of_range &e) {
-    error = e.what();
-    EXPECT_EQ("vector", e.what());
+typedef ft::vector<int> ftIntVector;
+typedef std::vector<int> stdVector;
+#define LOG(fn)                                                                \
+  if (log) {                                                                   \
+    std::cout << __func__;                                                     \
+    if (fn) {                                                                  \
+      std::cout << " OK";                                                      \
+    }                                                                          \
+    std::cout << std::endl;                                                    \
   }
-  try {
-    vector->at(0);
-    FAIL();
-  } catch (std::out_of_range &e) {
-    EXPECT_EQ(error, e.what());
+
+#define RANGE 100
+
+/* COMMON TESTS */
+template <typename T = ftIntVector, typename B = stdVector>
+void test_initial(T &v, B &v2, bool log = false) {
+  LOG(false);
+
+  EXPECT_EQ(v.size(), v2.size());
+  EXPECT_EQ(v.capacity(), v2.capacity());
+  EXPECT_EQ(v.empty(), v2.empty());
+  EXPECT_EQ(v.max_size(), v2.max_size());
+  if (v2.data() == nullptr) {
+    EXPECT_EQ(v.data(), nullptr);
+  } else {
+    EXPECT_EQ(v.data() != nullptr, true);
+    EXPECT_EQ(*(v.data()), *(v2.data()));
   }
-  EXPECT_EQ(trueVector->at(0), vector->at(0));
-  EXPECT_EQ(trueVector->front(), vector->front());
-  EXPECT_EQ(trueVector->back(), vector->back());
-  */
 
-  delete vector;
-  delete trueVector;
+  // TODO
+  // EXPECT_EQ(v.begin(), v2.begin());
+  // EXPECT_EQ(v.end(), v2.end());
+  // EXPECT_EQ(v.rbegin(), v2.rbegin());
+  // EXPECT_EQ(v.rend(), v2.rend());
 
-  ft::vector<int> stackVector;
-  std::vector<int> trueStackVector;
-  EXPECT_EQ(trueStackVector.size(), stackVector.size());
-  EXPECT_EQ(trueStackVector.capacity(), stackVector.capacity());
-  EXPECT_EQ(trueStackVector.empty(), stackVector.empty());
-  EXPECT_EQ(trueStackVector.max_size(), stackVector.max_size());
+  // TODO
+  // EXPECT_EQ(v.front(), v2.front());
+  // EXPECT_EQ(v.back(), v2.back());
+  LOG(true);
 }
 
-TEST(ManualVectorTest, AssignOperator) {
-  ft::vector<int> *vector = new ft::vector<int>();
-  std::vector<int> *trueVector = new std::vector<int>();
+template <typename T = ftIntVector, typename B = stdVector>
+void test_out_of_range(T &v, B &v2, int i, bool log = false) {
+  LOG(false);
+  // TODO check the what() of the exception
+  EXPECT_THROW((void)v.at(i), std::out_of_range);
+  EXPECT_THROW((void)v2.at(i), std::out_of_range);
+  EXPECT_THROW((void)v.at(-1), std::out_of_range);
+  EXPECT_THROW((void)v2.at(-1), std::out_of_range);
+  LOG(true);
+}
 
-  ft::vector<int> vector2 = *vector; // TODO c'est currieux, il n'est appeler
-                                     // que la ligne suivante
-  vector2 = *vector;
-  EXPECT_EQ(trueVector->size(), vector2.size());
-  EXPECT_EQ(trueVector->capacity(), vector2.capacity());
-  EXPECT_EQ(trueVector->empty(), vector2.empty());
-  EXPECT_EQ(trueVector->max_size(), vector2.max_size());
+template <typename T = ftIntVector, typename B = stdVector>
+void compare_values(T &v, B &v2, bool log = false) {
+  LOG(false);
+  for (size_t i = 0; i < v.size(); i++) {
+    EXPECT_EQ(v[i], v2[i]);
+    EXPECT_EQ(v.at(i), v2.at(i));
+  }
+  LOG(true);
+}
 
-  delete vector;
-  delete trueVector;
+/* UNIT TESTS */
+
+TEST(ManualVectorTest, DefaultConstructor) {
+  // heap
+  auto vector = std::make_unique<ftIntVector>();
+  auto trueVector = std::make_unique<stdVector>();
+  test_initial(*vector, *trueVector);
+  test_out_of_range(*vector, *trueVector, 0);
+
+  // stack
+  {
+    ftIntVector stackVector;
+    stdVector trueStackVector;
+    test_initial(stackVector, trueStackVector);
+    test_out_of_range(stackVector, trueStackVector, 0);
+  }
+  {
+    ftIntVector stackVector = ftIntVector();
+    stdVector trueStackVector = stdVector();
+    test_initial(stackVector, trueStackVector);
+    test_out_of_range(stackVector, trueStackVector, 0);
+  }
 }
 
 TEST(ManualVectorTest, FillConstructor) {
-  ft::vector<int> *vector = new ft::vector<int>(5);
-  std::vector<int> *trueVector = new std::vector<int>(5);
-  EXPECT_EQ(trueVector->size(), vector->size());
-  // EXPECT_EQ(5, vector->capacity());
-  //  TODO add
-  //  check if all values are 0 (init in the fill constructor)
-  //  for (int i = 0; i < 5; i++) {
-  //   EXPECT_EQ(0, vector[i]);
-  // }
+  {
+    ftIntVector vector(RANGE);
+    stdVector trueVector(RANGE);
+    test_initial(vector, trueVector);
+    test_out_of_range(vector, trueVector, RANGE);
+    compare_values(vector, trueVector);
+  }
+  {
+    const int i = 42;
+    stdVector trueVector(RANGE, i);
+    // ftIntVector vector(RANGE, i); // TODO il ne trouve pas le constructeur...
 
-  // TODO check leaks
-  delete vector;
+    // test_initial(vector, trueVector);
+    // test_out_of_range(vector, trueVector, RANGE);
+    // compare_values(vector, trueVector);
+  }
+  {
+    // ft::vector<std::string> vector(RANGE); // TODO segfault
+    std::vector<std::string> trueVector(RANGE);
+    // test_initial(vector, trueVector);
+    // test_out_of_range(vector, trueVector, RANGE);
+    // compare_values(vector, trueVector);
+  }
+}
+
+TEST(ManualVectorTest, RangeConstructor) {
+  // TODO
+  /*
+  {
+   stdVector trueVector(RANGE, 42);
+   ftIntVector vector(trueVector.begin(), trueVector.end());
+   test_initial(vector, trueVector);
+   test_out_of_range(vector, trueVector, RANGE);
+   compare_values(vector, trueVector);
+  }
+  {
+   stdVector trueVector(RANGE, 42);
+   ftIntVector vector(trueVector.rbegin(), trueVector.rend());
+   test_initial(vector, trueVector);
+   test_out_of_range(vector, trueVector, RANGE);
+   compare_values(vector, trueVector);
+  }
+  */
 }
 
 TEST(ManualVectorTest, CopyConstructor) {
-  ft::vector<int> *vector = new ft::vector<int>(5);
-  ft::vector<int> *vector2 = new ft::vector<int>(*vector);
-  EXPECT_EQ(5, vector2->size());
-  // EXPECT_EQ(5, vector2->capacity());
-  //  TODO add
-  delete vector;
-  delete vector2;
+  ftIntVector vector(RANGE);
+  ftIntVector vector2(vector);
+  test_initial<ftIntVector, ftIntVector>(vector2, vector);
+  test_out_of_range<ftIntVector, ftIntVector>(vector2, vector, RANGE);
+  compare_values<ftIntVector, ftIntVector>(vector2, vector);
+
+  stdVector trueVector(RANGE);
+  stdVector trueVector2(trueVector);
+  test_initial<stdVector, stdVector>(trueVector2, trueVector);
+  test_out_of_range<stdVector, stdVector>(trueVector2, trueVector, RANGE);
+  compare_values<stdVector, stdVector>(trueVector2, trueVector);
+
+  /// copy ft::vector VS std::vector
+  test_initial<ftIntVector, stdVector>(vector2, trueVector);
+  test_out_of_range<ftIntVector, stdVector>(vector2, trueVector, RANGE);
+  compare_values<ftIntVector, stdVector>(vector2, trueVector);
+
+  /// copy std::vector VS ft::vector
+  test_initial<stdVector, ftIntVector>(trueVector2, vector);
+  test_out_of_range<stdVector, ftIntVector>(trueVector2, vector, RANGE);
+  compare_values<stdVector, ftIntVector>(trueVector2, vector);
+
+  /// copy std::vector VS copy ft::vector
+  test_initial<stdVector, ftIntVector>(trueVector2, vector2);
+  test_out_of_range<stdVector, ftIntVector>(trueVector2, vector2, RANGE);
+  compare_values<stdVector, ftIntVector>(trueVector2, vector2);
+}
+
+TEST(ManualVectorTest, AssignOperator) {
+  {
+    ftIntVector *vector = new ftIntVector();
+    /// ftIntVector vectorAssigned = *vector; // Call the copy constructor
+    ftIntVector vectorAssigned;
+    vectorAssigned = *vector; // Call the assign operator
+
+    stdVector trueVector;
+    stdVector trueVectorAssigned;
+    trueVectorAssigned = trueVector;
+
+    /// copy ft::vector VS std::vector
+    test_initial<ftIntVector, stdVector>(vectorAssigned, trueVector);
+    test_out_of_range<ftIntVector, stdVector>(vectorAssigned, trueVector,
+                                              RANGE);
+    compare_values<ftIntVector, stdVector>(vectorAssigned, trueVector);
+
+    /// copy std::vector VS ft::vector
+    test_initial<stdVector, ftIntVector>(trueVectorAssigned, *vector);
+    test_out_of_range<stdVector, ftIntVector>(trueVectorAssigned, *vector,
+                                              RANGE);
+    compare_values<stdVector, ftIntVector>(trueVectorAssigned, *vector);
+
+    /// copy std::vector VS copy ft::vector
+    test_initial<stdVector, ftIntVector>(trueVectorAssigned, vectorAssigned);
+    test_out_of_range<stdVector, ftIntVector>(trueVectorAssigned,
+                                              vectorAssigned, RANGE);
+    compare_values<stdVector, ftIntVector>(trueVectorAssigned, vectorAssigned);
+  }
 }
 
 class VectorTest : public ::testing::Test {
 protected:
-  ft::vector<int> *vector = new ft::vector<int>();
-  void SetUp() override {}
-  ~VectorTest() { delete vector; }
+  ftIntVector *vector;
+  stdVector *trueVector;
+
+  void SetUp() override {
+    vector = new ftIntVector();
+    trueVector = new stdVector();
+  }
+
+  void PushBack(int i) {
+    vector->push_back(i);
+    trueVector->push_back(i);
+  }
+
+  void PushBackX(int n) {
+    for (int i = 0; i < n; i++) {
+      // random number between 0 and 100
+      PushBack(rand() % 100);
+    }
+  }
+
+  void print() {
+    std::cout << "ft::vector: ";
+    for (size_t i = 0; i < vector->size(); i++) {
+      std::cout << (*vector)[i] << " ";
+    }
+    std::cout << std::endl;
+    std::cout << "std::vector: ";
+    for (size_t i = 0; i < trueVector->size(); i++) {
+      std::cout << (*trueVector)[i] << " ";
+    }
+    std::cout << std::endl;
+  }
+
+  ~VectorTest() {
+    delete trueVector;
+    delete vector;
+  }
 };
 
 TEST_F(VectorTest, PushBack) {
-  vector->push_back(1);
-  vector->push_back(2);
-  EXPECT_EQ(2, vector->size());
-  // EXPECT_EQ(2, vector->capacity());
-  EXPECT_EQ(1, vector->at(0));
-  EXPECT_EQ(2, vector->at(1));
+  PushBackX(RANGE);
+  test_initial(*vector, *trueVector);
+  test_out_of_range(*vector, *trueVector, RANGE);
+  compare_values(*vector, *trueVector);
+  print();
 }

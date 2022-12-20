@@ -17,10 +17,10 @@ TEST(iterator_traitsTest, test1) {
 
   static_assert(std::is_same<IteratorType, int>::value,
                 "Error: iterator type is not int.");
-  int i = 0;
-  int j = 1;
-  bool b = i == j;
-  static_assert(b, "dslfjk");
+  // int i = 0;
+  // int j = 1;
+  // bool b = i == j;
+  // static_assert(b, "dslfjk");
   auto type = std::is_same<IteratorType, int>::value;
   EXPECT_EQ(type, true);
 

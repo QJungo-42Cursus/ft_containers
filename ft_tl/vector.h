@@ -2,6 +2,11 @@
 #define VECTOR_H
 #include <iostream>
 
+#define isLOG 1
+#define DEBUG(x)                                                               \
+  if (isLOG)                                                                   \
+    std::cout << x << std::endl;
+
 namespace ft {
 
 template <class T, class Allocator = std::allocator<T>> //
@@ -21,7 +26,9 @@ public:
   /* Constructor */
   // default (1)
   explicit vector(const Allocator &alloc = Allocator())
-      : _allocator(alloc), _size(0), _capacity(0), _array(NULL) {}
+      : _allocator(alloc), _size(0), _capacity(0), _array(NULL) {
+    DEBUG("default constructor");
+  }
   // fill (2)
   explicit vector(size_type n, const T &val = T(),
                   const Allocator &alloc = Allocator())
@@ -30,11 +37,16 @@ public:
     for (size_type i = 0; i < n; i++) {
       _array[i] = val;
     }
+    DEBUG("fill constructor");
   }
   // range (3)
   template <class InputIterator> // TODO comprendre
   vector(InputIterator first, InputIterator last,
-         const Allocator &alloc = Allocator());
+         const Allocator &alloc = Allocator()) {
+    // TODO
+    DEBUG("range constructor");
+    return;
+  }
   // copy (4)
   vector(const vector &x)
       : _allocator(x._allocator), _size(x._size), _capacity(x._capacity) {
@@ -42,11 +54,12 @@ public:
     for (size_type i = 0; i < _size; i++) {
       _array[i] = x._array[i];
     }
+    DEBUG("copy constructor");
   }
 
   // Assign operator
   vector &operator=(const vector &x) {
-    std::cout << "assign operator" << std::endl;
+    DEBUG("assign operator");
     if (this != &x) {
       _allocator = x._allocator;
       _size = x._size;
@@ -67,7 +80,7 @@ public:
   const_iterator begin() const;
   iterator end();
   const_iterator end() const;
-  reverse_iterator<iterator> rbegin();
+  reverse_iterator<iterator> rbegin() {}
   const_reverse_iterator<const_iterator> rbegin() const;
   reverse_iterator<iterator> rend();
   const_reverse_iterator<const_iterator> rend() const;
@@ -82,70 +95,76 @@ public:
   size_type capacity() const { return _capacity; }
   void resize(size_type n, T val = T());
   bool empty() const { return _size == 0; }
-  void reserve(size_type n);
+  void reserve(size_type n) {
+    // TODO
+    // si j'ai bien compris : assure qu'on ai n de capacity
+  }
   void shrink_to_fit();
 
   // Element acces
-  T &operator[](size_type n);
-  const T &operator[](size_type n) const;
+  T &operator[](size_type n) {
+    if (n >= _size) {
+      throw std::out_of_range("vector1"); // TODO
+    }
+    return _array[n];
+  }
+  const T &operator[](size_type n) const {
+    if (n >= _size) {
+      throw std::out_of_range("2vector"); // TODO
+    }
+    return _array[n];
+  }
   T &at(size_type n) {
     if (n >= _size) {
-      throw std::out_of_range("vector"); // TODO
+      throw std::out_of_range("3vector"); // TODO
     }
     return _array[n];
   }
   const T &at(size_type n) const {
     if (n >= _size || n < 0) {
-      throw std::out_of_range("vector"); // TODO
+      throw std::out_of_range("4vector"); // TODO
     }
     return _array[n];
   }
   T front() {
     if (_size == 0) {
-      throw std::out_of_range("vector"); // TODO
+      throw std::out_of_range("5vector"); // TODO
     }
     return _array[0];
   }
   const T front() const {
     if (_size == 0) {
-      throw std::out_of_range("vector"); // TODO
+      throw std::out_of_range("6vector"); // TODO
     }
     return _array[0];
   }
   T &back() {
     if (_size == 0) {
-      throw std::out_of_range("vector"); // TODO
+      throw std::out_of_range("7vector"); // TODO
     }
     return _array[_size - 1];
   }
   const T &back() const {
     if (_size == 0) {
-      throw std::out_of_range("vector"); // TODO
+      throw std::out_of_range("8vector"); // TODO
     }
     return _array[_size - 1];
   }
-  T *data() {
-    if (_size == 0) {
-      throw std::out_of_range("vector"); // TODO
-    }
-    return _array;
-  }
-  const T *data() const {
-    if (_size == 0) {
-      throw std::out_of_range("vector"); // TODO
-    }
-    return _array;
-  }
+  T *data() { return _size == 0 ? NULL : _array; }
+  const T *data() const { return _size == 0 ? NULL : _array; }
 
   // Modifiers
   void push_back(const T &val) {
     if (_capacity == _size) {
+      // TODO juste resize ...
       T *tmp_array = _array;
       size_type old_capacity = _capacity;
-      _capacity += 10; // TODO pourquoi pas plus ou moins ?
+      _capacity =
+          _capacity == 0 ? 1 : _capacity * 2; // apparement, il double la
+                                              // capacité a chaque fois
       _array = _allocator.allocate(_capacity);
       for (size_type i = 0; i < _size; i++) {
-        _array[i] = tmp_array[i];
+        _array[i] = T(tmp_array[i]); // TODO ca va call le copy constructo !
       }
       _allocator.deallocate(tmp_array, old_capacity);
     }
@@ -177,19 +196,29 @@ public:
 
   template <class... Args> // WTF
   iterator emplace(const_iterator position, Args &&...args);
-  template <class... Args> void emplace_back(Args &&...args); // WTF
+  //{
+  // TODO
+  // meme chose qu'en dessous, mais a la position de l'iterator ?
+  //}
+  template <class... Args> void emplace_back(Args &&...args) {
+    // TODO va construire l'objet T directement dans la liste
+    // (au lieu de le construire dans la stack main et de copier
+    T newEl = T(std::forward<Args>(args)...);
+  }
 
   // Allocator
   Allocator get_allocator() const;
 
+  /* operator overload */
 private:
+  /* Members */
   Allocator _allocator;
   size_type _size;
   size_type _capacity;
   T *_array;
 };
 
-/* operator overload */
+/* operator overload
 template <class T, class Alloc>
 bool operator==(const vector<T, Alloc> &lhs, const vector<T, Alloc> &rhs);
 
@@ -207,6 +236,8 @@ bool operator>(const vector<T, Alloc> &lhs, const vector<T, Alloc> &rhs);
 
 template <class T, class Alloc>
 bool operator>=(const vector<T, Alloc> &lhs, const vector<T, Alloc> &rhs);
+
+*/
 
 /* Swap between two vectors */
 template <class T, class Alloc>
