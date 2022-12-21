@@ -1,6 +1,6 @@
 #include "../rbtree/Node.h"
 #include "../rbtree/RedBlackTree.h"
-#include "gtest/gtest.h"
+#include "../pch.h"
 
 TEST(NodeTestManual, Constructor) {
   Node<int> *node = new Node<int>(1);

@@ -1,7 +1,5 @@
 #include "../ft_tl/iterator_traits.h"
-#include "gtest/gtest.h"
-#include <iterator>
-#include <vector>
+#include "../pch.h"
 
 TEST(iterator_traitsTest, test1) {
   std::vector<int> vec{1, 2, 3, 4, 5};

@@ -1,6 +1,6 @@
 #ifndef STACK_H
 #define STACK_H
-#include <iostream>
+#include "../pch.h"
 
 template <typename T> class Vector;
 
@@ -43,8 +43,8 @@ template <class T, class Container>
 void swap(Stack<T, Container> &x,
           Stack<T, Container> &y) noexcept(noexcept(x.swap(y)));
 
-template <class T, class Container, class Alloc>
-struct uses_allocator<Stack<T, Container>, Alloc>;
+// template <class T, class Container, class Alloc>
+//  struct uses_allocator<Stack<T, Container>, Alloc>;
 
 } // namespace ft
 

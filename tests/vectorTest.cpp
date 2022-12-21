@@ -1,7 +1,5 @@
 #include "../ft_tl/vector.h"
-#include "gtest/gtest.h"
-#include <memory>
-#include <vector>
+#include "../pch.h"
 
 typedef ft::vector<int> ftIntVector;
 typedef std::vector<int> stdVector;
@@ -15,6 +13,8 @@ typedef std::vector<int> stdVector;
   }
 
 #define RANGE 100
+
+// TODO check leacks with destroy ?
 
 /* COMMON TESTS */
 template <typename T = ftIntVector, typename B = stdVector>
@@ -236,6 +236,22 @@ protected:
   }
 };
 
+/* Iterators */
+TEST_F(VectorTest, begin) {}
+TEST_F(VectorTest, end) {}
+TEST_F(VectorTest, rbegin) {}
+TEST_F(VectorTest, rend) {}
+TEST_F(VectorTest, cbegin) {}
+TEST_F(VectorTest, cend) {}
+TEST_F(VectorTest, crbegin) {}
+TEST_F(VectorTest, crend) {}
+
+/* Capacity */
+/// une bonne partie est testee dans test_initial()
+TEST_F(VectorTest, resize) {}
+TEST_F(VectorTest, reserve) {}
+TEST_F(VectorTest, shrink_to_fit) {}
+
 TEST_F(VectorTest, PushBack) {
   PushBackX(RANGE);
   test_initial(*vector, *trueVector);
@@ -243,3 +259,23 @@ TEST_F(VectorTest, PushBack) {
   compare_values(*vector, *trueVector);
   print();
 }
+
+TEST_F(VectorTest, PopBack) {
+  PushBackX(RANGE);
+  for (int i = 0; i < RANGE; i++) {
+    vector->pop_back();
+    trueVector->pop_back();
+    // test_initial(*vector, *trueVector); // TODO segfault
+    test_out_of_range(*vector, *trueVector, RANGE);
+    compare_values(*vector, *trueVector);
+  }
+}
+
+TEST_F(VectorTest, assign) {}
+TEST_F(VectorTest, insert) {}
+TEST_F(VectorTest, erase) {}
+TEST_F(VectorTest, swap) {}
+TEST_F(VectorTest, clear) {}
+TEST_F(VectorTest, emplace) {}
+TEST_F(VectorTest, emplace_back) {}
+TEST_F(VectorTest, get_allocator) {}

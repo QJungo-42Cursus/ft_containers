@@ -1,6 +1,6 @@
 #include "../rbtree/RedBlackTree.h"
+#include "../pch.h"
 #include "../rbtree/Node.h"
-#include "gtest/gtest.h"
 
 TEST(RedBlackTreeManualTest, keyExist) {
   RedBlackTree<int> *rbtree = new RedBlackTree<int>();

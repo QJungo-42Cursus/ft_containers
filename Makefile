@@ -2,12 +2,7 @@ NAME =     	tests_out
 CC =		c++
 CFLAGS =	-Wall -Wextra -Werror 
 #CFLAGS =	-Wall -Wextra -Werror -std=c++98 -pedantic-errors
-# permet de recompiler les fichiers .o si les headers ont ete modifies
-# TODO trouver une solution pour ne pas recompiler les fichiers .o qui ne dependent pas des headers
-%.o: %.cpp Makefile $(HEADERS)
-	$(CC) $(CFLAGS) -c $< -o $@
-#$(CC) $(CFLAGS) -MMD -MP -c $< -o $@
-OBJS =		$(SRCS:.cpp=.o)
+
 RM =		rm -f
 GTEST =		/usr/local/lib/libgtest.a
 
@@ -27,19 +22,33 @@ HEADERS =	rbtree/RedBlackTree.h \
 			ft_tl/iterator_traits.h \
 			ft_tl/pair.h \
 
+%.o: %.cpp Makefile
+	$(CC) $(CFLAGS) -c $< -o $@
+
+%.h.gch: %.h
+	$(CC) $(CFLAGS) $< -o $@
+
+OBJS =		$(SRCS:.cpp=.o)
+HEADERS_OBJS =	$(HEADERS:.h=.h.gch)
+
+PCH = pch.h.gch
+
 all: $(NAME)
 
 $(NAME): build
 	./$(NAME)
 
-build: $(OBJS)
+$(PCH):
+	$(CC) $(CFLAGS) pch.h -o $(PCH)
+
+build: $(PCH) $(HEADERS_OBJS) $(OBJS)
 	@$(CC) $(CFLAGS) $(OBJS) -o $(NAME) $(GTEST)
 
 clean:
-	@$(RM) $(OBJS)
+	@$(RM) $(OBJS) $(HEADERS_OBJS)
 
 fclean: clean
-	@$(RM) $(NAME)
+	@$(RM) $(NAME) $(PCH)
 
 re: fclean build
 

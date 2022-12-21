@@ -1,9 +1,7 @@
 #ifndef REDBLACKTREE_H
 #define REDBLACKTREE_H
+#include "../pch.h"
 #include "Node.h"
-#include <iostream>
-#include <queue>
-#include <vector>
 
 template <class T, class Compare = std::less<T>,
           class Alloc = std::allocator<T>>

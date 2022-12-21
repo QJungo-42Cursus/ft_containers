@@ -1,5 +1,6 @@
 #ifndef PAIR_H
 #define PAIR_H
+#include "../pch.h"
 
 namespace ft {
 template <class T1, class T2> struct pair {

@@ -1,6 +1,6 @@
 #ifndef VECTOR_H
 #define VECTOR_H
-#include <iostream>
+#include "../pch.h"
 
 #define isLOG 1
 #define DEBUG(x)                                                               \
@@ -173,7 +173,7 @@ public:
   }
 
   void pop_back() {
-    _allocator.destroy(_array[_size]);
+    //_allocator.destroy(_array[_size]);
     _size--;
   }
 
@@ -200,7 +200,8 @@ public:
   // TODO
   // meme chose qu'en dessous, mais a la position de l'iterator ?
   //}
-  template <class... Args> void emplace_back(Args &&...args) {
+  template <class... Args> //
+  void emplace_back(Args &&...args) {
     // TODO va construire l'objet T directement dans la liste
     // (au lieu de le construire dans la stack main et de copier
     T newEl = T(std::forward<Args>(args)...);
@@ -219,6 +220,7 @@ private:
 };
 
 /* operator overload
+ * TODO implement ?
 template <class T, class Alloc>
 bool operator==(const vector<T, Alloc> &lhs, const vector<T, Alloc> &rhs);
 
@@ -239,7 +241,7 @@ bool operator>=(const vector<T, Alloc> &lhs, const vector<T, Alloc> &rhs);
 
 */
 
-/* Swap between two vectors */
+/* Swap between two vectors */ // TODO existe deja dans la classe ?
 template <class T, class Alloc>
 void swap(vector<T, Alloc> &x, vector<T, Alloc> &y);
 

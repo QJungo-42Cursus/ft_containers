@@ -1,1 +1,1 @@
-require('telescope').setup{ defaults = { file_ignore_patterns = { "%.o" } }}
+require('telescope').setup{ defaults = { file_ignore_patterns = { "%.o", "%.gch" } }}
