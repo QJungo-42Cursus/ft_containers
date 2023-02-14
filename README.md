@@ -1,4 +1,4 @@
 # ft_containers
-**`<vector>` easy, not `<set>`**
+**`<vector>` easy, `<set>` no easy**
 
 📂 ... work in progress
